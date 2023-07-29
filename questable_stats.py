@@ -1151,13 +1151,37 @@ class Floor2(CelestialConvergence):
             DynaminaToad(level=10),
                 ],
         "wave 2": [
+            BlightWalker(level=12),
             Shadowstalker(level=10),
-
-            
+            BlightWalker(level=12),
         ]
             }
     waves = 2
-    loot_chest_rarities = [LootChests().rarities[0]]
+    loot_chest_rarities = LootChests().rarities[:1]
+
+
+class Floor3(CelestialConvergence):
+    floor = "Floor 3"
+    rewards = [
+       "100 Credits",
+       "500 Universal XP",
+       "5 Diamond ore",
+       "aurelia"
+    ]
+    enemies = {
+        "wave 1": [
+            Mummy(level=15),
+            DynaminaToad(level=15),
+            Mummy(level=15),
+                ],
+        "wave 2": [
+            Shadowstalker(level=20),
+            ArchonIcarus(level=30),
+            Shadowstalker(level=20),
+                  ]
+            }
+    waves = 2
+    loot_chest_rarities = LootChests().rarities[:3]
 
 
       
