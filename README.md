@@ -27,6 +27,8 @@ Use `r!manual` for any more queries about the game.
 
 You can always ask for support in the official discord server. 
 
+***Quests are not complete. Items, relics, quests, and much more to be released in the future***
+
 ## Credits
 Design - Raymus
 
