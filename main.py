@@ -1332,31 +1332,31 @@ async def team_command(ctx):
 @profile_check()
 async def team_set(ctx, team, *characters):
     if await team_check(ctx, team, characters, presence=False): return
-    characters = []
+    characters_ = []
     for character in characters:
-        if character not in characters:
-            characters.append(character.lower)
-    new_characters = characters.copy()
-    new_characters.extend( [None] * (4-len(characters)) )
+        if character not in characters_:
+            characters_.append(character.lower())
+    new_characters = characters_[:]
+    new_characters.extend( [None] * (4-len(characters_)) )
     inventory[str(ctx.author.id)]['teams'][team] = new_characters
     dump_json("inventory")
-    new_characters = ', '.join(characters)
+    new_characters = ', '.join(characters_)
     await ctx.reply(f'Team {team} set to {new_characters}')
 
 @team_command.command(name='add')
 @profile_check()
 async def team_add(ctx, team, *characters):
     if await team_check(ctx, team, characters): return
-    characters = []
+    characters_ = []
     for character in characters:
-        if character not in characters:
-            characters.append(character.lower)
+        if character not in characters_:
+            characters_.append(character.lower())
     current_team = [character for character in inventory[str(ctx.author.id)]['teams'][team] if character is not None]
-    if len(current_team) + len(characters) > 4:
+    if len(current_team) + len(characters_) > 4:
         return await ctx.reply('Team size is too large, maximum is 4 characters per team')
 
-    current_team.extend(characters)
-    current_team.extend( [None] * (4-len(characters)) )
+    current_team.extend(characters_)
+    current_team.extend( [None] * (4-len(characters_)) )
     inventory[str(ctx.author.id)]['teams'][team] = current_team
     dump_json("inventory")
     await ctx.reply(f"Added {', '.join(characters)} to team {team}")
@@ -1365,20 +1365,20 @@ async def team_add(ctx, team, *characters):
 @profile_check()
 async def team_remove(ctx, team, *characters):
     if await team_check(ctx, team, characters, presence=False): return
-    characters = []
+    characters_ = []
     for character in characters:
-        if character not in characters:
-            characters.append(character.lower)
+        if character not in characters_:
+            characters_.append(character.lower())
     current_team = [character for character in inventory[str(ctx.author.id)]['teams'][team] if character is not None]
-    if len(current_team) - len(characters) <= 0 and \
+    if len(current_team) - len(characters_) <= 0 and \
         inventory[str(ctx.author.id)]['teams']['selected'] == team:
         return await ctx.reply('Selected team cannot be empty')
 
-    new_team = [character for character in current_team if character not in characters]
-    new_team.extend( [None] * (4-len(characters)) )
+    new_team = [character for character in current_team if character not in characters_]
+    new_team.extend( [None] * (4-len(characters_)) )
     inventory[str(ctx.author.id)]['teams'][team] = new_team
     dump_json("inventory")
-    await ctx.reply(f"Removed {', '.join(characters)} from team {team}")
+    await ctx.reply(f"Removed {', '.join(characters_)} from team {team}")
 
 async def show_team_set(selected_team, user):
   embed = discord.Embed(title=f'Displaying team {selected_team}', description=f'Use the numbers below to navigate between team sets.\nTo edit your teams, use `r!team set (team no.) (characters)` to set your team or use `r!team add (team no.) (character)`.', colour=discord.Colour.blurple())
@@ -3245,6 +3245,8 @@ def title(s):
   return new_s
 
 # To-do
+# Quests
+    # full test
 # Update manual
 # relics
   # mana regen, disrupt, battlefield manipulation, def shred, dmg reflection
