@@ -4,7 +4,7 @@ A casual turn-based RPG game discord bot.
 
 Discord bot [invite link](https://discord.com/api/oauth2/authorize?client_id=1108680864751165510&permissions=534723950656&scope=bot)
 
-Questable offical [discord server](https://discord.gg/WxyrZ4SVVv)
+Questable official [discord server](https://discord.gg/WxyrZ4SVVv)
 
 ## About
 Questable is a discord bot that has a unique story where you solve mind-boggling puzzles and fight monsters to figure out more about yourself. 
