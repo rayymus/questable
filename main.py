@@ -1055,6 +1055,7 @@ async def battle(ctx, char, enemy_waves,
           rarities = loot_chest_rarities or qstats.LootChests().rarities[:-3]
           weights = [i**1.5 for i in range(2, len(rarities)+2)]
           rarity = random.choices(rarities, weights=weights, k=1)
+          print(rarity)
           loot = qstats.LootChests().open_chest(rarity[0])
           for item in loot:
             print(item)
@@ -3050,6 +3051,7 @@ class CelestialConvergenceStart(discord.ui.View):
         if battle_result == "Won":
             rewards = self.floor_object.rewards
             inventory[str(self.author.id)]["Celestial Convergence"]["completed"].append(self.floor_object.floor)
+            dump_json("inventory")
             for item in rewards:
                 if item.endswith(' Credits'):
                     inventory[str(interaction.user.id)]['balance'] += int(''.join([i for i in item if i.isdigit()]))
@@ -3085,14 +3087,15 @@ class CelestialConvergenceStart(discord.ui.View):
                         await make_relic(interaction.user, item, level=1)
                     else:
                         await make_item(interaction.user, item, level=math.floor(new_level*1.1))
-            dump_json("inventory")
-            dump_json("quests")
+            
             loot_msg = "\n".join(rewards)
-            embed = discord.Embed(title=f'Defeated floor {self.floor_object.floor}', 
+            embed = discord.Embed(title=f'Defeated {self.floor_object.floor}', 
                                   description=f'Loot:\n {loot_msg}')
             await interaction.channel.send(embed=embed)
         else: # Loss
             await interaction.channel.send("You've been defeated, try again next time.")
+
+        dump_json("inventory")
 
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.author.id
