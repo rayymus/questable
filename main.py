@@ -1,5 +1,4 @@
 import os, json, asyncio, requests
-from discord.interactions import Interaction
 import math, random
 from io import BytesIO
 import discord
@@ -3086,8 +3085,12 @@ class CelestialConvergenceStart(discord.ui.View):
                         await make_relic(interaction.user, item, level=1)
                     else:
                         await make_item(interaction.user, item, level=math.floor(new_level*1.1))
-                dump_json("inventory")
-                dump_json("quests")
+            dump_json("inventory")
+            dump_json("quests")
+            loot_msg = "\n".join(rewards)
+            embed = discord.Embed(title=f'Defeated floor {self.floor_object.floor}', 
+                                  description=f'Loot:\n {loot_msg}')
+            await interaction.channel.send(embed=embed)
         else: # Loss
             await interaction.channel.send("You've been defeated, try again next time.")
 
