@@ -2882,7 +2882,7 @@ async def market_info(ctx, id):
                           colour=discord.Colour.yellow())
     item = '_'.join(item_name.lower().split())
     file = discord.File(fp=f'textures/{slot}/{item}.png', filename=f'{item}.png')
-    embed.set_image(url=f"attachment://{item_name}.png")
+    embed.set_image(url=f"attachment://{item}.png")
     embed.set_footer(text=f'Displaying market item {id}')
     await ctx.reply(embed=embed, file=file)
 
