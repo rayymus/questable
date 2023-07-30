@@ -2806,8 +2806,9 @@ async def market(ctx, *, filter=None):
                           description="**ID ​ ​ ​ ​ ​ ​ ​ ​  ​ ​​ ​• ​  ​ ​ ​ ​ ​  ​​ ​ ​ ​  ​​ ​ Name ​    ​  ​ ​ • ​ ​ ​ ​  ​   LVL ​ • ​ Power ​ • ​ Price**\n",
                           colour=discord.Colour.brand_red()) 
     
-    filter = filter.split()
-    filter_type = filter[0]
+    if filter is not None:
+        filter = filter.split()
+        filter_type = filter[0]
     if filter is not None and filter_type.lower() != "=mine":
         try:
             filter_operator = filter[1]
