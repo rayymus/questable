@@ -600,6 +600,12 @@ async def truncate_user(ctx, authorid):
     dump_json("stats")
     await ctx.reply("wiped")
 
+@bot.command(name="restart")
+async def restart_bot(ctx):
+    if ctx.author.id != 561372656134520842: return
+    await ctx.send("Restarting")
+    await bot.close()
+
 
 ongoing_battles = {}
 async def battle(ctx, char, enemy_waves, 
@@ -2799,10 +2805,11 @@ async def market(ctx, *, filter=None):
     embed = discord.Embed(title="Player Market", 
                           description="**ID ​ ​ ​ ​ ​ ​ ​ ​  ​ ​​ ​• ​  ​ ​ ​ ​ ​  ​​ ​ ​ ​  ​​ ​ Name ​    ​  ​ ​ • ​ ​ ​ ​  ​   LVL ​ • ​ Power ​ • ​ Price**\n",
                           colour=discord.Colour.brand_red()) 
-    if filter is not None and filter[0].lower() != "=mine":
+    
+    filter = filter.split()
+    filter_type = filter[0]
+    if filter is not None and filter_type.lower() != "=mine":
         try:
-            filter = filter.split()
-            filter_type = filter[0]
             filter_operator = filter[1]
             if len(filter_operator) > 2:
                 raise IndexError('Invalid filter operator')
@@ -2823,7 +2830,6 @@ async def market(ctx, *, filter=None):
             item_name =  get_first_key(m[item_id]["info"])
             item_stats = m[item_id]["info"][item_name]
             price = m[item_id]["price"]
-
             if filter is not None:
                 if filter_type.lower() in {"=n", "=name"}:
                     if item_name.lower() != filter_value.lower():
@@ -2834,7 +2840,7 @@ async def market(ctx, *, filter=None):
                 elif filter_type.lower() == "=power":
                     if not compare(item_stats["power"], filter_operator, int(filter_value)):
                         continue
-                elif filter_type.lower() != "=mine":
+                elif filter_type.lower() == "=mine":
                     if m[item_id]["owner"] != ctx.author.id:
                         continue
 
