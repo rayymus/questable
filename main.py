@@ -2878,7 +2878,7 @@ async def market_info(ctx, id):
     else:
         slot = "relics"
     embed = discord.Embed(title=f'Market Info: {item_name}', 
-                          description=f"Price: {price}\n{desc}", 
+                          description=f"Price: {price} Credits\n{desc}", 
                           colour=discord.Colour.yellow())
     item = '_'.join(item_name.lower().split())
     file = discord.File(fp=f'textures/{slot}/{item}.png', filename=f'{item}.png')
