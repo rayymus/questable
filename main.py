@@ -282,11 +282,16 @@ async def tutorial_sequence_2(ctx):
     await ctx.channel.send("You're all set! You can always check the `r!manual` whenever you need to")
 
 
+tutorial_channels = []
 @bot.command(name='start')
 async def start(ctx):
     if str(ctx.author.id) in inventory:
         await ctx.reply("You've already started")
         return
+    if ctx.channel.id in tutorial_channels:
+        return await ctx.reply("Start the tutorial in another channel")
+
+    tutorial_channels.append(ctx.channel.id)
 
     inventory[str(ctx.author.id)] = {'balance': 100, 
                                    'profile_toggle': {'private': False, 'show_balance': True},
@@ -575,12 +580,26 @@ async def shop_buy(ctx, *item):
   dump_json("inventory")
   await ctx.reply(f'Successfully purchased {item} for {SHOP_ITEMS[item]}.')
   
+
+#  Dev commands
 @bot.command(name='add_character', aliases=['ac'])
 @profile_check()
-async def trial_battle(ctx, authorid, character):
+async def add_character(ctx, authorid, character):
     if ctx.author.id != 561372656134520842: return
     await make_character(bot.get_user(int(authorid)), character)
     await ctx.reply("done")
+
+@bot.command(name='truncate')
+async def truncate_user(ctx, authorid):
+    if ctx.author.id != 561372656134520842: return
+    del quests[authorid]
+    del inventory[authorid]
+    del stats[authorid]
+    dump_json("quests")
+    dump_json("inventory")
+    dump_json("stats")
+    await ctx.reply("wiped")
+
 
 ongoing_battles = {}
 async def battle(ctx, char, enemy_waves, 
@@ -2474,6 +2493,7 @@ class QuestsView(discord.ui.View):
             async def quest_button_callback(interaction: discord.Interaction):
                 quests[str(self.author.id)][quest_object.title] = {}
                 quests[str(self.author.id)][quest_object.title]["started"] = True
+                quests[str(self.author.id)][quest_object.title]["done"] = False
                 quests[str(self.author.id)][quest_object.title]["step"] = 0
                 quests[str(self.author.id)][quest_object.title]["checkpoint"] = [0]
                 quests[str(self.author.id)][quest_object.title]["task"] = quest_object.tasks[0]
