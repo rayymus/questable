@@ -2872,8 +2872,14 @@ async def market_info(ctx, id):
         desc += f'/{levels[get_level(item_stats[stat])+1]}'
       desc += '\n'
   
-    slot = qstats.get_item_stats(item_name)['slot']
-    embed = discord.Embed(title=f'Market Info: {item_name}', description=f"Price: {price}\n{desc}", colour=get_rarity_colour(qstats.get_item_stats(item)['rarity']))
+    item_stats = qstats.get_item_stats(item_name)
+    if item_stats is not None:
+        slot = item_stats['slot']
+    else:
+        slot = "relics"
+    embed = discord.Embed(title=f'Market Info: {item_name}', 
+                          description=f"Price: {price}\n{desc}", 
+                          colour=discord.Colour.yellow())
     item = '_'.join(item.lower().split())
     file = discord.File(fp=f'textures/{slot}/{item}.png', filename=f'{item}.png')
     embed.set_image(url=f"attachment://{item_name}.png")
