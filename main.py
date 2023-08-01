@@ -144,6 +144,7 @@ def update_item_stats(user, item_id, prev_level):
     dump_json("inventory")
   
 async def make_character(user, character):
+    if character in stats[str(user.id)]: return
     stats[str(user.id)][character] = {key: value for key, value in qstats.get_base_stats(character).items() if key in {'hp', 'atk', 'def', 'spd'}} 
     stats[str(user.id)][character]['level'] = 1
     stats[str(user.id)][character]['xp'] = 0
@@ -1486,7 +1487,10 @@ async def equip(ctx, character, *item_ids):
     item_stats = qstats.get_item_stats(item)
     if item_stats is not None: #  not relic
         if item_stats['class'] is not None and qstats.get_base_stats(character)['class'] != item_stats['class']:
-            await ctx.reply(f"Unable to equip {item}; unmatched classes"); break
+            await ctx.reply(f"Unable to equip {item}; unmatched classes")
+            if random.randint(1, 3) == 1:
+                await ctx.channel.send("Take note of your characters' and items' classes,\nyou can view these with `r!character_info` and `r!item_info`\nCheck the `r!manual` for any more information")
+            break
 
         slot = item_stats['slot']
         if (prev_item := inventory[str(ctx.author.id)]['equipped'][character][slot]) is not None:
@@ -1911,6 +1915,7 @@ class Step32Puzzle(discord.ui.View):
             embed.set_image(url="attachment://image.png")
             view = Step32Puzzle(interaction.user, interaction, grid=self.grid, coordinates=self.coordinates)
             if self.grid[1][-2] == "main": #  accomplished
+                self.stop()
                 quest_title = get_started_quest(interaction.user)
                 quest_info = quests[str(interaction.user.id)][quest_title]["checkpoint"][1]
                 view = discord.ui.View()
@@ -1942,8 +1947,8 @@ class Step32Puzzle(discord.ui.View):
                         [None, None, None, None, None, None],
                         [None, "air", "block", "air", "air", None],
                         [None, "air", "block", "block", "air", None], 
-                        [None, "block", "block", "air", "block", None], 
-                        [None, "main",  "block", "air", "air", None],
+                        [None, "block", "block", "air", "air", None], 
+                        [None, "main",  "block", "air", "block", None],
                         [None, None, None, None, None, None],
                         ] 
             await display_grid(interaction)
@@ -2010,6 +2015,7 @@ class Step29Puzzle(discord.ui.View):
             embed.add_field(name="Pile 1", value=len(self.pile_1))
             embed.add_field(name="Pile 2", value=len(self.pile_2))
             if self.pile_1.count("W") == self.pile_2.count("W"):
+                self.stop()
                 self.disabled = (True, True, True)
                 quest_title = get_started_quest(self.author)
                 quest_info = quests[str(self.author.id)][quest_title]["checkpoint"][1]
@@ -2313,8 +2319,8 @@ def quest_continue_function(author, quest_info):
                             [None, None, None, None, None, None],
                             [None, "air", "block", "air", "air", None],
                             [None, "air", "block", "block", "air", None], 
-                            [None, "block", "block", "air", "block", None], 
-                            [None, "main",  "block", "air", "air", None],
+                            [None, "block", "block", "air", "air", None], 
+                            [None, "main",  "block", "air", "block", None],
                             [None, None, None, None, None, None],
                             ] 
                 for row in grid_list[1:-1]:
