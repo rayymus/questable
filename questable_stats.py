@@ -1166,7 +1166,7 @@ class Floor3(CelestialConvergence):
        "100 Credits",
        "500 Universal XP",
        "5 Diamond ore",
-       "aurelia"
+       "Aurelia"
     ]
     enemies = {
         "wave 1": [
