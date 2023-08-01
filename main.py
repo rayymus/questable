@@ -592,12 +592,12 @@ async def add_character(ctx, authorid, character):
 @bot.command(name='truncate')
 async def truncate_user(ctx, authorid):
     if ctx.author.id != 561372656134520842: return
-    del quests[authorid]
     del inventory[authorid]
-    del stats[authorid]
-    dump_json("quests")
     dump_json("inventory")
+    del stats[authorid]
     dump_json("stats")
+    del quests[authorid]
+    dump_json("quests")
     await ctx.reply("wiped")
 
 @bot.command(name="restart")
@@ -1004,6 +1004,8 @@ async def battle(ctx, char, enemy_waves,
       url='https://cdn.discordapp.com/attachments/1046831128553734217/1125050474765221958/victory.gif'
         )
           await ctx.channel.send(embed=embed)
+          if loot_chest_rarities == []:
+             return "Won"
           rarities = loot_chest_rarities or qstats.LootChests().rarities[:-3]
           weights = [i**1.5 for i in range(2, len(rarities)+2)]
           rarity = random.choices(rarities, weights=weights, k=1)
@@ -1587,6 +1589,7 @@ async def info(ctx, item_id):
 
   slot = qstats.get_item_stats(item)['slot']
   embed = discord.Embed(title=f'Info: {item}', description=desc, colour=get_rarity_colour(qstats.get_item_stats(item)['rarity']))
+  item = item.lower().replace("'", "")
   item = '_'.join(item.lower().split())
   file = discord.File(fp=f'textures/{slot}/{item}.png', filename=f'{item}.png')
   embed.set_image(url=f"attachment://{item}.png")
@@ -2535,8 +2538,9 @@ class QuestsView(discord.ui.View):
             else:
                 disabled = True
             if (quest.title in quests[str(self.author.id)] \
-            and not quests[str(self.author.id)][quest.title]["done"]):
+            and quests[str(self.author.id)][quest.title]["done"]):
                 disabled = True
+                style = discord.ButtonStyle.green
             quest_button = discord.ui.Button(label=quest.title,
                                              disabled=disabled,
                                              style=style)
@@ -2930,8 +2934,8 @@ async def market_sell(ctx, item_id, price):
         item_id = list(inventory[str(ctx.author.id)]['items'].keys())[-1]
     if item_id not in inventory[str(ctx.author.id)]['items']:
       await ctx.reply("You don't have this item"); return
-    if not price.isdigit():
-        return await ctx.reply("Invalid price")
+    if not price.isdigit() or int(price) <= 100:
+        return await ctx.reply("Invalid price, price must be > 100")
     
     item = get_first_key(inventory[str(ctx.author.id)]['items'][item_id])
     item_stats = inventory[str(ctx.author.id)]['items'][item_id]
@@ -3006,8 +3010,13 @@ class CelestialConvergenceStart(discord.ui.View):
         enemy_waves = []
         for wave in range(1, self.floor_object.waves+1):
             enemy_waves.append(self.floor_object.enemies[f"wave {wave}"])
+        loot_chest_rarities = self.floor_object.loot_chest_rarities
+        if self.floor_object.floor in inventory[str(interaction.user.id)]["Celestial Convergence"]["completed"]:
+            loot_chest_rarities = []
         battle_result = await battle(interaction, team, enemy_waves, 
-                                     user=interaction.user, loot_chest_rarities=self.floor_object.loot_chest_rarities)
+                                     user=interaction.user, loot_chest_rarities=loot_chest_rarities)
+        if self.floor_object.floor in inventory[str(interaction.user.id)]["Celestial Convergence"]["completed"]:
+            return
         if battle_result == "Won":
             rewards = self.floor_object.rewards
             inventory[str(self.author.id)]["Celestial Convergence"]["completed"].append(self.floor_object.floor)
@@ -3079,6 +3088,9 @@ class CelestialConvergenceFloors(discord.ui.View):
                         level = enemy.stats_dict["level"]
                         name = enemy.name
                         embed.description += f"\n{name} Level {level}"
+                embed.description += "\n*Rewards*"
+                for reward in floor_object.rewards:
+                    embed.description += f"\n{reward}"
 
                 selected_team = inventory[str(interaction.user.id)]['teams']['selected']
                 img = await show_team_set(selected_team, interaction.user)
@@ -3094,29 +3106,17 @@ class CelestialConvergenceFloors(discord.ui.View):
         for i, floor in enumerate(floors):
             if floor().floor in inventory[str(self.author.id)]["Celestial Convergence"]["completed"]:
                 style = discord.ButtonStyle.green
-                disabled = True
             else:
                 style = discord.ButtonStyle.blurple
-                if floors[i-1].floor in inventory[str(self.author.id)]["Celestial Convergence"]["completed"] \
-                or i == 0:
-                    disabled = False
-                else:
-                    disabled = True
             button = discord.ui.Button(label=floor().floor, 
                                        style=style, 
-                                       disabled=disabled)
+                                       disabled=False)
             button.callback = make_function(floor())
             self.add_item(button)
 
     async def interaction_check(self, interaction: discord.Interaction):
        return interaction.user.id == self.author.id
             
-            
-for userid in inventory:
-    inventory[userid]["Celestial Convergence"] = {}
-    inventory[userid]["Celestial Convergence"]["completed"] = []
-with open("inventory.json", "w") as f:
-    json.dump(inventory, f)
 
 @bot.group(name="celestial", aliases=["c"])
 async def celestial(ctx):
