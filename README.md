@@ -35,5 +35,3 @@ Design - Raymus
 Images - Raymus created on pixilart.com
 
 Game - Raymus
-
-## NOT FOR REPRODUCTIVE USE
